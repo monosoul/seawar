@@ -3,6 +3,8 @@ package to.uk.ekbkloz.seawar.model.ui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -17,13 +19,17 @@ public class ShipsAdditionPanel extends JPanel {
 
     private static final long serialVersionUID = -7436304367252831567L;
     
-    private Ship shipToAdd = null;
+    private final Queue<Ship> shipToAdd = new ArrayBlockingQueue<Ship>(1);
     
     
     public Ship getShipToAdd() {
-        return shipToAdd;
+        return shipToAdd.poll();
     }
-
+    
+    
+    public void setShipToAdd(final Ship ship) {
+        shipToAdd.offer(ship);
+    }
 
 
     public ShipsAdditionPanel() {
@@ -34,7 +40,7 @@ public class ShipsAdditionPanel extends JPanel {
         carrierAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                shipToAdd = new Carrier();
+                setShipToAdd(new Carrier());
             }
             
         });
@@ -44,7 +50,7 @@ public class ShipsAdditionPanel extends JPanel {
         battleshipAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                shipToAdd = new Battleship();
+                setShipToAdd(new Battleship());
             }
             
         });
@@ -54,7 +60,7 @@ public class ShipsAdditionPanel extends JPanel {
         cruiserAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                shipToAdd = new Cruiser();
+                setShipToAdd(new Cruiser());
             }
             
         });
@@ -64,7 +70,7 @@ public class ShipsAdditionPanel extends JPanel {
         destroyerAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                shipToAdd = new Destroyer();
+                setShipToAdd(new Destroyer());
             }
             
         });
