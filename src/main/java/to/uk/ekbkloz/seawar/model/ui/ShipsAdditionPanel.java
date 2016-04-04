@@ -30,7 +30,7 @@ public class ShipsAdditionPanel extends JPanel {
         this.setBackground(Color.WHITE);
         this.setSize(400, 200);
         
-        final JButton carrierAddButton = new JButton("авианосец");
+        final JButton carrierAddButton = new JButton("Р°РІРёР°РЅРѕСЃРµС†");
         carrierAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -40,7 +40,7 @@ public class ShipsAdditionPanel extends JPanel {
         });
         this.add(carrierAddButton);
         
-        final JButton battleshipAddButton = new JButton("линкор");
+        final JButton battleshipAddButton = new JButton("Р»РёРЅРєРѕСЂ");
         battleshipAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -50,7 +50,7 @@ public class ShipsAdditionPanel extends JPanel {
         });
         this.add(battleshipAddButton);
         
-        final JButton cruiserAddButton = new JButton("крейсер");
+        final JButton cruiserAddButton = new JButton("РєСЂРµР№СЃРµСЂ");
         cruiserAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -60,7 +60,7 @@ public class ShipsAdditionPanel extends JPanel {
         });
         this.add(cruiserAddButton);
         
-        final JButton destroyerAddButton = new JButton("эсминец");
+        final JButton destroyerAddButton = new JButton("СЌСЃРјРёРЅРµС†");
         destroyerAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

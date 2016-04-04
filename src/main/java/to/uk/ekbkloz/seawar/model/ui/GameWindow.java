@@ -25,16 +25,16 @@ public class GameWindow extends JFrame {
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setResizable(false);
         
-        //Верхняя панель
+        //РІРµСЂС…РЅСЏСЏ РїР°РЅРµР»СЊ
         final JPanel topPanel = new JPanel(new BorderLayout());
         this.add(topPanel, BorderLayout.SOUTH);
         
-        //Игровое поле
+        //РёРіСЂРѕРІРѕРµ РїРѕР»Рµ
         final JPanel middlePanel = new JPanel(new GridBagLayout());
         this.add(middlePanel, BorderLayout.CENTER);
         final GridBagConstraints c = new GridBagConstraints();
         
-        //поле игрока 1
+        //РїРѕР»Рµ РёРіСЂРѕРєР° 1
         c.fill = GridBagConstraints.BOTH;
         c.ipady = 400;
         c.ipadx = 400;
@@ -44,7 +44,7 @@ public class GameWindow extends JFrame {
         middlePanel.add(firstPlayerMap, c);
         //final Ship ship1 = new Ship(4);
         //ship1.place(firstPlayerMap, new Coordinates(5, 5), ShipOrientation.SOUTH);
-        //кнопки игрока 1
+        //РєРЅРѕРїРєРё РёРіСЂРѕРєР° 1
         c.fill = GridBagConstraints.BOTH;
         c.ipady = 0;
         c.ipadx = 40;
@@ -54,7 +54,7 @@ public class GameWindow extends JFrame {
         middlePanel.add(firstPlayerShipsAdditionPanel, c);
         
         
-        //поле игрока 2
+        //РїРѕР»Рµ РёРіСЂРѕРєР° 2
         c.fill = GridBagConstraints.BOTH;
         c.ipady = 400;
         c.ipadx = 400;
@@ -63,7 +63,7 @@ public class GameWindow extends JFrame {
         final SeaMap secondPlayerMap = new SeaMap();
         middlePanel.add(secondPlayerMap, c);
         
-        //кнопки игрока 2
+        //РєРЅРѕРїРєРё РёРіСЂРѕРєР° 2
         c.fill = GridBagConstraints.BOTH;
         c.ipady = 0;
         c.ipadx = 40;
@@ -72,11 +72,11 @@ public class GameWindow extends JFrame {
         final ShipsAdditionPanel secondPlayerShipsAdditionPanel = new ShipsAdditionPanel();
         middlePanel.add(secondPlayerShipsAdditionPanel, c);
         
-        //Нижняя панель
+        //РЅРёР¶РЅСЏСЏ РїР°РЅРµР»СЊ
         final JPanel bottomPanel = new JPanel(new BorderLayout());
         this.add(bottomPanel, BorderLayout.SOUTH);
         
-        //Кнопка выхода
+        //РєРЅРѕРїРєР° РІС‹С…РѕРґР°
         final JButton exitButton = new JButton("Exit");
         exitButton.addActionListener(new ActionListener() {
             @Override
@@ -88,7 +88,7 @@ public class GameWindow extends JFrame {
         bottomPanel.add(exitButton, BorderLayout.EAST);
         
         
-        //выбор места расположения корабля
+        //РІС‹Р±РѕСЂ РјРµСЃС‚Р° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РєРѕСЂР°Р±Р»СЏ
         this.addMouseListener(new MouseAdapter() {
 
             @Override

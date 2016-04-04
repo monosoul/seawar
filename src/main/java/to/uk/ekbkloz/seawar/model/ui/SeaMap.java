@@ -93,13 +93,13 @@ public class SeaMap extends JPanel {
             System.out.println("backCoordinates: (" + backCoordinates.getX() + ";" + backCoordinates.getY() + ")");
             
             if (backCoordinates.getX() < MAPSIZE && backCoordinates.getX() >= 0 && backCoordinates.getY() < MAPSIZE && backCoordinates.getY() >= 0) {
-                // Проверяем возможность поставить корабль
+                // РџСЂРѕРІРµСЂСЏРµРј РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїРѕСЃС‚Р°РІРёС‚СЊ РєРѕСЂР°Р±Р»СЊ
                 int availableFields;
                 int x;
                 int y;
                 if (ship.getFaceCoordinates() != null) {
                     availableFields = 1;
-                    System.out.println("Корабль уже есть на карте");
+                    System.out.println("РљРѕСЂР°Р±Р»СЊ СѓР¶Рµ РµСЃС‚СЊ РЅР° РєР°СЂС‚Рµ");
                     x = faceCoordinates.getX() + orientation.getXStep();
                     y = faceCoordinates.getY() + orientation.getYStep();
                 }
@@ -115,13 +115,13 @@ public class SeaMap extends JPanel {
                     else {
                         availableFields++;
                     }
-                    System.out.println("тест (" + x + ";" + y + ")");
+                    System.out.println("С‚РµСЃС‚ (" + x + ";" + y + ")");
                         
                     x+=orientation.getXStep();
                     y+=orientation.getYStep();
                 }
                 if (availableFields == ship.getSize()) {
-                    System.out.println("Подходящее место найдено");
+                    System.out.println("РџРѕРґС…РѕРґСЏС‰РµРµ РјРµСЃС‚Рѕ РЅР°Р№РґРµРЅРѕ");
                     ship.setOrientation(orientation);
                     ship.setFaceCoordinates(faceCoordinates);
                     ship.setBackCoordinates(backCoordinates);
@@ -166,7 +166,7 @@ public class SeaMap extends JPanel {
                     final Coordinates fieldCoordinates = new Coordinates(x, y);
                     setField(fieldCoordinates, FieldStatus.WATER);
                     shipsMap.remove(fieldCoordinates);
-                    System.out.println("Тест2");
+                    System.out.println("РўРµСЃС‚2");
                         
                     x += shipOrientation.getXStep();
                     y += shipOrientation.getYStep();
@@ -176,7 +176,7 @@ public class SeaMap extends JPanel {
             }
         }
         catch(final Exception e){
-            System.out.println("Здесь корабля нет!");
+            System.out.println("Р—РґРµСЃСЊ РєРѕСЂР°Р±Р»СЏ РЅРµС‚!");
         }
     }
     
@@ -193,7 +193,7 @@ public class SeaMap extends JPanel {
                 final Coordinates fieldCoordinates = new Coordinates(x, y);
                 setField(fieldCoordinates, FieldStatus.WATER);
                 shipsMap.remove(fieldCoordinates);
-                System.out.println("Тест3");
+                System.out.println("РўРµСЃС‚3");
                         
                 x += ship.getOrientation().getXStep();
                 y += ship.getOrientation().getYStep();
@@ -201,7 +201,7 @@ public class SeaMap extends JPanel {
             return ship;
         }
         catch(final Exception e) {
-            System.out.println("Здесь корабля нет!");
+            System.out.println("Р—РґРµСЃСЊ РєРѕСЂР°Р±Р»СЏ РЅРµС‚!");
             return null;
         }
     }
