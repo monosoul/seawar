@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import to.uk.ekbkloz.seawar.model.players.HumanPlayer;
 import to.uk.ekbkloz.seawar.model.ships.Ship;
 
 public class GameWindow extends JFrame {
@@ -50,7 +51,7 @@ public class GameWindow extends JFrame {
         c.ipadx = 40;
         c.gridx = 0;
         c.gridy = 1;
-        final ShipsAdditionPanel firstPlayerShipsAdditionPanel = new ShipsAdditionPanel();
+        final ShipsAdditionPanel firstPlayerShipsAdditionPanel = new ShipsAdditionPanel(new HumanPlayer());
         middlePanel.add(firstPlayerShipsAdditionPanel, c);
         
         
@@ -69,7 +70,7 @@ public class GameWindow extends JFrame {
         c.ipadx = 40;
         c.gridx = 1;
         c.gridy = 1;
-        final ShipsAdditionPanel secondPlayerShipsAdditionPanel = new ShipsAdditionPanel();
+        final ShipsAdditionPanel secondPlayerShipsAdditionPanel = new ShipsAdditionPanel(new HumanPlayer());
         middlePanel.add(secondPlayerShipsAdditionPanel, c);
         
         //нижняя панель

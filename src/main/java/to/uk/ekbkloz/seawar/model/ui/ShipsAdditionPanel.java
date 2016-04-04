@@ -9,10 +9,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import to.uk.ekbkloz.seawar.model.ships.Battleship;
-import to.uk.ekbkloz.seawar.model.ships.Carrier;
-import to.uk.ekbkloz.seawar.model.ships.Cruiser;
-import to.uk.ekbkloz.seawar.model.ships.Destroyer;
+import to.uk.ekbkloz.seawar.model.players.Player;
 import to.uk.ekbkloz.seawar.model.ships.Ship;
 
 public class ShipsAdditionPanel extends JPanel {
@@ -20,6 +17,7 @@ public class ShipsAdditionPanel extends JPanel {
     private static final long serialVersionUID = -7436304367252831567L;
     
     private final Queue<Ship> shipToAdd = new ArrayBlockingQueue<Ship>(1);
+    private final Player player;
     
     
     public Ship getShipToAdd() {
@@ -32,7 +30,8 @@ public class ShipsAdditionPanel extends JPanel {
     }
 
 
-    public ShipsAdditionPanel() {
+    public ShipsAdditionPanel(final Player player) {
+        this.player = player;
         this.setBackground(Color.WHITE);
         this.setSize(400, 200);
         
@@ -40,7 +39,7 @@ public class ShipsAdditionPanel extends JPanel {
         carrierAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                setShipToAdd(new Carrier());
+                setShipToAdd(player.getCarrier());
             }
             
         });
@@ -50,7 +49,7 @@ public class ShipsAdditionPanel extends JPanel {
         battleshipAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                setShipToAdd(new Battleship());
+                setShipToAdd(player.getBattleship());
             }
             
         });
@@ -60,7 +59,7 @@ public class ShipsAdditionPanel extends JPanel {
         cruiserAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                setShipToAdd(new Cruiser());
+                setShipToAdd(player.getCruiser());
             }
             
         });
@@ -70,7 +69,7 @@ public class ShipsAdditionPanel extends JPanel {
         destroyerAddButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                setShipToAdd(new Destroyer());
+                setShipToAdd(player.getDestroyer());
             }
             
         });
