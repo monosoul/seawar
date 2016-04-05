@@ -150,10 +150,9 @@ public class SeaMap extends JPanel {
         }
     }
     
-    public void rotateShip(Coordinates coordinates) {
-        if (coordinates == null) {
-            coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
-        }
+    public void rotateShip() {
+        final Coordinates coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
+        
         try{
             final Ship ship = shipsMap.get(coordinates);
             final Coordinates shipFaceCoordinates = ship.getFaceCoordinates();
@@ -180,10 +179,9 @@ public class SeaMap extends JPanel {
         }
     }
     
-    public Ship removeShip(Coordinates coordinates) {
-        if (coordinates == null) {
-            coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
-        }
+    public Ship removeShip() {
+        final Coordinates coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
+            
         try{
             final Ship ship = shipsMap.get(coordinates);
 

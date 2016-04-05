@@ -14,6 +14,11 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import to.uk.ekbkloz.seawar.model.players.HumanPlayer;
+import to.uk.ekbkloz.seawar.model.players.Player;
+import to.uk.ekbkloz.seawar.model.ships.Battleship;
+import to.uk.ekbkloz.seawar.model.ships.Carrier;
+import to.uk.ekbkloz.seawar.model.ships.Cruiser;
+import to.uk.ekbkloz.seawar.model.ships.Destroyer;
 import to.uk.ekbkloz.seawar.model.ships.Ship;
 
 public class GameWindow extends JFrame {
@@ -51,7 +56,8 @@ public class GameWindow extends JFrame {
         c.ipadx = 40;
         c.gridx = 0;
         c.gridy = 1;
-        final ShipsAdditionPanel firstPlayerShipsAdditionPanel = new ShipsAdditionPanel(new HumanPlayer());
+        final Player player = new HumanPlayer();
+        final ShipsAdditionPanel firstPlayerShipsAdditionPanel = new ShipsAdditionPanel();
         middlePanel.add(firstPlayerShipsAdditionPanel, c);
         
         
@@ -70,7 +76,7 @@ public class GameWindow extends JFrame {
         c.ipadx = 40;
         c.gridx = 1;
         c.gridy = 1;
-        final ShipsAdditionPanel secondPlayerShipsAdditionPanel = new ShipsAdditionPanel(new HumanPlayer());
+        final ShipsAdditionPanel secondPlayerShipsAdditionPanel = new ShipsAdditionPanel();
         middlePanel.add(secondPlayerShipsAdditionPanel, c);
         
         //нижняя панель
@@ -96,7 +102,23 @@ public class GameWindow extends JFrame {
             public void mouseClicked(final MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getButton() == MouseEvent.BUTTON1) {
-                    final Ship ship = firstPlayerShipsAdditionPanel.getShipToAdd();
+                    Ship ship = null;;
+
+                    if (firstPlayerShipsAdditionPanel.getShipToAdd() != null) {
+                        if (firstPlayerShipsAdditionPanel.getShipToAdd().equals(Carrier.class)) {
+                            ship = player.getCarrier();
+                        }
+                        if (firstPlayerShipsAdditionPanel.getShipToAdd().equals(Battleship.class)) {
+                            ship = player.getBattleship();
+                        }
+                        if (firstPlayerShipsAdditionPanel.getShipToAdd().equals(Cruiser.class)) {
+                            ship = player.getCruiser();
+                        }
+                        if (firstPlayerShipsAdditionPanel.getShipToAdd().equals(Destroyer.class)) {
+                            ship = player.getDestroyer();
+                        }
+                    }
+                    
                     if (ship != null) {
                         if (firstPlayerMap.checkShipPlacement(ship, null)) {
                             firstPlayerMap.placeShip(ship);
@@ -104,10 +126,14 @@ public class GameWindow extends JFrame {
                     }
                 }
                 if (e.getButton() == MouseEvent.BUTTON2) {
-                    firstPlayerMap.rotateShip(null);
+                    firstPlayerMap.rotateShip();
                 }
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    firstPlayerMap.removeShip(null);
+                    final Ship ship = firstPlayerMap.removeShip();
+                    
+                    if (ship != null) {
+                        player.returnShip(ship);
+                    }
                 }
             }
             

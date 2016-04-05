@@ -7,6 +7,7 @@ import to.uk.ekbkloz.seawar.model.ships.Battleship;
 import to.uk.ekbkloz.seawar.model.ships.Carrier;
 import to.uk.ekbkloz.seawar.model.ships.Cruiser;
 import to.uk.ekbkloz.seawar.model.ships.Destroyer;
+import to.uk.ekbkloz.seawar.model.ships.Ship;
 
 public abstract class Player {
     protected Queue<Carrier>    carriers    = new ArrayBlockingQueue<Carrier>(Carrier.MAXAMOUNT);
@@ -63,5 +64,18 @@ public abstract class Player {
         this.destroyers.offer(destroyer);
     }
     
-    
+    public void returnShip(final Ship ship) {
+        if (ship.getClass().equals(Carrier.class)) {
+            returnCarrier((Carrier) ship);
+        }
+        if (ship.getClass().equals(Battleship.class)) {
+            returnBattleship((Battleship) ship);
+        }
+        if (ship.getClass().equals(Cruiser.class)) {
+            returnCruiser((Cruiser) ship);
+        }
+        if (ship.getClass().equals(Destroyer.class)) {
+            returnDestroyer((Destroyer) ship);
+        }
+    }
 }
