@@ -64,10 +64,14 @@ public class SeaMap extends JPanel {
     }
     
     public Boolean checkShipPlacement(final Ship ship, Coordinates faceCoordinates) {
+        if (!this.isVisible()) {
+            return false;
+        } 
         if (faceCoordinates == null) {
             faceCoordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
         }
         final List<ShipOrientation> shipOrientations = Arrays.asList(ShipOrientation.values());
+        System.out.println("shipOrientations.size() = " + shipOrientations.size());
         int orientationIndex;
         if (ship.getOrientation() != null) {
             orientationIndex = shipOrientations.indexOf(ship.getOrientation());
@@ -76,13 +80,15 @@ public class SeaMap extends JPanel {
             orientationIndex = 0;
         }
         final int initialOrientationIndex = orientationIndex;
-        boolean fullCycle = false;
+        int iterations = 0;
         
         //for(final ShipOrientation orientation : shipOrientations) {
-        while(!fullCycle) {
+        while(iterations<shipOrientations.size()) {
             if (orientationIndex >= shipOrientations.size()) {
                 orientationIndex = 0;
             }
+            System.out.println("initialOrientationIndex = " + initialOrientationIndex);
+            System.out.println("orientationIndex = " + orientationIndex);
             
             final ShipOrientation orientation = shipOrientations.get(orientationIndex);
             
@@ -129,15 +135,16 @@ public class SeaMap extends JPanel {
                 }
             }
             orientationIndex++;
-            if (orientationIndex == initialOrientationIndex) {
-                fullCycle = true;
-            }
+            iterations++;
         }
         
         return false;
     }
 
     public void placeShip(final Ship ship) {
+        if (!this.isVisible()) {
+            return;
+        } 
         int x = ship.getFaceCoordinates().getX();
         int y = ship.getFaceCoordinates().getY();
         while(Math.abs(ship.getFaceCoordinates().getX() - x) < ship.getSize() && Math.abs(ship.getFaceCoordinates().getY() - y) < ship.getSize()) {
@@ -151,6 +158,9 @@ public class SeaMap extends JPanel {
     }
     
     public void rotateShip() {
+        if (!this.isVisible()) {
+            return;
+        } 
         final Coordinates coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
         
         try{
@@ -180,6 +190,9 @@ public class SeaMap extends JPanel {
     }
     
     public Ship removeShip() {
+        if (!this.isVisible()) {
+            return null;
+        } 
         final Coordinates coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
             
         try{
@@ -196,6 +209,9 @@ public class SeaMap extends JPanel {
                 x += ship.getOrientation().getXStep();
                 y += ship.getOrientation().getYStep();
             }
+            ship.setFaceCoordinates(null);
+            ship.setBackCoordinates(null);
+            ship.setOrientation(null);
             return ship;
         }
         catch(final Exception e) {

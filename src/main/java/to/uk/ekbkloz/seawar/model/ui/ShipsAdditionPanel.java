@@ -16,9 +16,11 @@ public class ShipsAdditionPanel extends JPanel {
 
     private static final long serialVersionUID = -7436304367252831567L;
     
+    @SuppressWarnings("rawtypes")
     private Class shipToAdd = null;
     
     
+    @SuppressWarnings("rawtypes")
     public Class getShipToAdd() {
         return shipToAdd;
     }

@@ -13,7 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import to.uk.ekbkloz.seawar.model.players.HumanPlayer;
+import to.uk.ekbkloz.seawar.model.GamePhase;
 import to.uk.ekbkloz.seawar.model.players.Player;
 import to.uk.ekbkloz.seawar.model.ships.Battleship;
 import to.uk.ekbkloz.seawar.model.ships.Carrier;
@@ -23,6 +23,11 @@ import to.uk.ekbkloz.seawar.model.ships.Ship;
 
 public class GameWindow extends JFrame {
     private static final long serialVersionUID = -202136959207752221L;
+    private final GamePhase gamePhase;
+    private Player curPlayerTurn;
+    private final JPanel middlePanel;
+    private final JPanel bottomPanel;
+    private final GridBagConstraints gridBagConstraints;
 
     public GameWindow() {
         this.setTitle("Sea War");
@@ -31,57 +36,42 @@ public class GameWindow extends JFrame {
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setResizable(false);
         
+        gamePhase = GamePhase.ShipAddtion;
+        
         //верхняя панель
-        final JPanel topPanel = new JPanel(new BorderLayout());
-        this.add(topPanel, BorderLayout.SOUTH);
+        //final JPanel topPanel = new JPanel(new BorderLayout());
+        //this.add(topPanel, BorderLayout.SOUTH);
         
         //игровое поле
-        final JPanel middlePanel = new JPanel(new GridBagLayout());
+        middlePanel = new JPanel(new GridBagLayout());
         this.add(middlePanel, BorderLayout.CENTER);
-        final GridBagConstraints c = new GridBagConstraints();
-        
-        //поле игрока 1
-        c.fill = GridBagConstraints.BOTH;
-        c.ipady = 400;
-        c.ipadx = 400;
-        c.gridx = 0;
-        c.gridy = 0;
-        final SeaMap firstPlayerMap = new SeaMap();
-        middlePanel.add(firstPlayerMap, c);
-        //final Ship ship1 = new Ship(4);
-        //ship1.place(firstPlayerMap, new Coordinates(5, 5), ShipOrientation.SOUTH);
-        //кнопки игрока 1
-        c.fill = GridBagConstraints.BOTH;
-        c.ipady = 0;
-        c.ipadx = 40;
-        c.gridx = 0;
-        c.gridy = 1;
-        final Player player = new HumanPlayer();
-        final ShipsAdditionPanel firstPlayerShipsAdditionPanel = new ShipsAdditionPanel();
-        middlePanel.add(firstPlayerShipsAdditionPanel, c);
-        
-        
-        //поле игрока 2
-        c.fill = GridBagConstraints.BOTH;
-        c.ipady = 400;
-        c.ipadx = 400;
-        c.gridx = 1;
-        c.gridy = 0;
-        final SeaMap secondPlayerMap = new SeaMap();
-        middlePanel.add(secondPlayerMap, c);
-        
-        //кнопки игрока 2
-        c.fill = GridBagConstraints.BOTH;
-        c.ipady = 0;
-        c.ipadx = 40;
-        c.gridx = 1;
-        c.gridy = 1;
-        final ShipsAdditionPanel secondPlayerShipsAdditionPanel = new ShipsAdditionPanel();
-        middlePanel.add(secondPlayerShipsAdditionPanel, c);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.ipady = 0;
+        gridBagConstraints.ipadx = 400;
         
         //нижняя панель
-        final JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel = new JPanel(new BorderLayout());
         this.add(bottomPanel, BorderLayout.SOUTH);
+        
+        //кнопка завершения добавления кораблей
+        final JButton shipsAdditionEndButton = new JButton("Готово!");
+        shipsAdditionEndButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (curPlayerTurn.getShipsCount() > 0) {
+                    System.out.println("Вы добавили не все корабли!");
+                }
+                else {
+                    middlePanel.removeAll();
+                    curPlayerTurn.endTurn();
+                    curPlayerTurn = null;
+                    middlePanel.repaint();
+                }
+            }
+            
+        });
+        bottomPanel.add(shipsAdditionEndButton, BorderLayout.CENTER);
         
         //кнопка выхода
         final JButton exitButton = new JButton("Exit");
@@ -101,38 +91,43 @@ public class GameWindow extends JFrame {
             @Override
             public void mouseClicked(final MouseEvent e) {
                 super.mouseClicked(e);
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    Ship ship = null;;
+                if (gamePhase.equals(GamePhase.ShipAddtion)) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        Ship ship = null;;
 
-                    if (firstPlayerShipsAdditionPanel.getShipToAdd() != null) {
-                        if (firstPlayerShipsAdditionPanel.getShipToAdd().equals(Carrier.class)) {
-                            ship = player.getCarrier();
+                        if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd() != null) {
+                            if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd().equals(Carrier.class)) {
+                                ship = curPlayerTurn.getCarrier();
+                            }
+                            if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd().equals(Battleship.class)) {
+                                ship = curPlayerTurn.getBattleship();
+                            }
+                            if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd().equals(Cruiser.class)) {
+                                ship = curPlayerTurn.getCruiser();
+                            }
+                            if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd().equals(Destroyer.class)) {
+                                ship = curPlayerTurn.getDestroyer();
+                            }
                         }
-                        if (firstPlayerShipsAdditionPanel.getShipToAdd().equals(Battleship.class)) {
-                            ship = player.getBattleship();
-                        }
-                        if (firstPlayerShipsAdditionPanel.getShipToAdd().equals(Cruiser.class)) {
-                            ship = player.getCruiser();
-                        }
-                        if (firstPlayerShipsAdditionPanel.getShipToAdd().equals(Destroyer.class)) {
-                            ship = player.getDestroyer();
+                        
+                        if (ship != null) {
+                            if (curPlayerTurn.getOwnMap().checkShipPlacement(ship, null)) {
+                                curPlayerTurn.getOwnMap().placeShip(ship);
+                            }
+                            else {
+                                curPlayerTurn.returnShip(ship);
+                            }
                         }
                     }
-                    
-                    if (ship != null) {
-                        if (firstPlayerMap.checkShipPlacement(ship, null)) {
-                            firstPlayerMap.placeShip(ship);
-                        }
+                    if (e.getButton() == MouseEvent.BUTTON2) {
+                        curPlayerTurn.getOwnMap().rotateShip();
                     }
-                }
-                if (e.getButton() == MouseEvent.BUTTON2) {
-                    firstPlayerMap.rotateShip();
-                }
-                if (e.getButton() == MouseEvent.BUTTON3) {
-                    final Ship ship = firstPlayerMap.removeShip();
-                    
-                    if (ship != null) {
-                        player.returnShip(ship);
+                    if (e.getButton() == MouseEvent.BUTTON3) {
+                        final Ship ship = curPlayerTurn.getOwnMap().removeShip();
+                        
+                        if (ship != null) {
+                            curPlayerTurn.returnShip(ship);
+                        }
                     }
                 }
             }
@@ -141,4 +136,40 @@ public class GameWindow extends JFrame {
         
         this.setVisible(true);
     }
+    
+    public void initializeMap (final Player player) {
+        //поле с информацией
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        middlePanel.add(player.getInformation(), gridBagConstraints);
+        
+        //игровое поле
+        gridBagConstraints.ipady = 400;
+        gridBagConstraints.ipadx = 400;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        middlePanel.add(player.getOwnMap(), gridBagConstraints);
+        
+        //поле противника
+        gridBagConstraints.ipady = 400;
+        gridBagConstraints.ipadx = 400;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        middlePanel.add(player.getOpponentMap(), gridBagConstraints);
+        
+        //кнопки добавления кораблей
+        gridBagConstraints.ipady = 0;
+        gridBagConstraints.ipadx = 400;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        middlePanel.add(player.getShipsAdditionPanel(), gridBagConstraints);
+        
+        curPlayerTurn = player;
+        middlePanel.repaint();
+    }
+
 }
