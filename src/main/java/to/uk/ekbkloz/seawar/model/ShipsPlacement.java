@@ -8,11 +8,13 @@ import to.uk.ekbkloz.seawar.model.ships.Ship;
 public class ShipsPlacement {
     private final FieldStatus fields[][];
     private Map<Coordinates, Ship> shipsMap;
+    private Map<Coordinates, FieldStatus> shotsMap;
     private boolean fieldsFilled;
     
     public ShipsPlacement(final int mapSize) {
         fields = new FieldStatus[mapSize][mapSize];
         shipsMap = new HashMap<Coordinates, Ship>();
+        shotsMap = new HashMap<Coordinates, FieldStatus>();
         fieldsFilled = false;
     }
 
@@ -35,8 +37,13 @@ public class ShipsPlacement {
     public void setFieldsFilled(final boolean fieldsFilled) {
         this.fieldsFilled = fieldsFilled;
     }
-    
-    
-    
+
+    public Map<Coordinates, FieldStatus> getShotsMap() {
+        return shotsMap;
+    }
+
+    public void setShotsMap(final Map<Coordinates, FieldStatus> shotsMap) {
+        this.shotsMap = shotsMap;
+    }
     
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.JPanel;
 
@@ -47,6 +48,9 @@ public class SeaMap extends JPanel {
             }
             this.shipsPlacement.setFieldsFilled(true);
         }
+        for (final Entry<Coordinates, FieldStatus> entry : this.shipsPlacement.getShotsMap().entrySet()) {
+            this.shipsPlacement.getFields()[entry.getKey().getX()][entry.getKey().getY()] = entry.getValue();
+        }
         
         this.setEnabled(true);
         this.setVisible(true);
@@ -63,6 +67,9 @@ public class SeaMap extends JPanel {
 
     
     public Boolean checkField(final Coordinates coordinates, final FieldStatus newStatus) {
+        if (coordinates.getX() >= SeaMap.MAPSIZE || coordinates.getX() < 0 || coordinates.getY() >= SeaMap.MAPSIZE || coordinates.getY() < 0) {
+            return false;
+        }
         switch(shipsPlacement.getFields()[coordinates.getX()][coordinates.getY()]) {
             case WATER: if (newStatus.equals(FieldStatus.SHIP) || newStatus.equals(FieldStatus.MISS)) {
                           return true;
@@ -90,6 +97,9 @@ public class SeaMap extends JPanel {
         } 
         if (faceCoordinates == null) {
             faceCoordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
+        }
+        if (faceCoordinates.getX() >= SeaMap.MAPSIZE || faceCoordinates.getX() < 0 || faceCoordinates.getY() >= SeaMap.MAPSIZE || faceCoordinates.getY() < 0) {
+            return false;
         }
         final List<ShipOrientation> shipOrientations = Arrays.asList(ShipOrientation.values());
         System.out.println("shipOrientations.size() = " + shipOrientations.size());
@@ -248,14 +258,21 @@ public class SeaMap extends JPanel {
         if (coordinates == null) {
             coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
         }
-        if (checkField(coordinates, FieldStatus.HIT) || shipsPlacement.getShipsMap().containsKey(coordinates)) {
-            setField(coordinates, FieldStatus.HIT);
-            shipsPlacement.getShipsMap().remove(coordinates);
+        if (shipsPlacement.getShotsMap().containsKey(coordinates)) {
             return true;
         }
         else {
-            setField(coordinates, FieldStatus.MISS);
-            return false;
+            if (checkField(coordinates, FieldStatus.HIT) || shipsPlacement.getShipsMap().containsKey(coordinates)) {
+                setField(coordinates, FieldStatus.HIT);
+                shipsPlacement.getShipsMap().remove(coordinates);
+                shipsPlacement.getShotsMap().put(coordinates, FieldStatus.HIT);
+                return true;
+            }
+            else {
+                setField(coordinates, FieldStatus.MISS);
+                shipsPlacement.getShotsMap().put(coordinates, FieldStatus.MISS);
+                return false;
+            }
         }
     }
     

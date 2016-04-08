@@ -3,6 +3,7 @@ package to.uk.ekbkloz.seawar;
 import java.util.Map;
 
 import to.uk.ekbkloz.seawar.model.Coordinates;
+import to.uk.ekbkloz.seawar.model.FieldStatus;
 import to.uk.ekbkloz.seawar.model.GamePhase;
 import to.uk.ekbkloz.seawar.model.players.HumanPlayer;
 import to.uk.ekbkloz.seawar.model.players.Player;
@@ -35,12 +36,17 @@ public class MainApp {
         players[1].getOpponentShipsPlacement().setShipsMap(p1shipsMap);
         
         int i = 0;
+        Map<Coordinates, FieldStatus> shotsMapBuffer = null;
         while(!w.getGamePhase().equals(GamePhase.GameOver)) {
+            if (shotsMapBuffer != null) {
+                players[i].getOwnShipsPlacement().setShotsMap(shotsMapBuffer);
+            }
             w.invokeTurn(players[i]);
             System.out.println("Ход игрока " + (i + 1));
             while(!players[i].isTurnEnded()) {
                 Thread.sleep(200);
             }
+            shotsMapBuffer = players[i].getOpponentShipsPlacement().getShotsMap();
             i++;
             if (i >= players.length) {
                 i = 0;

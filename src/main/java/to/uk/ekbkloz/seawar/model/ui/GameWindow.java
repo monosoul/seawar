@@ -181,14 +181,14 @@ public class GameWindow extends JFrame {
                 }
                 if (gamePhase.equals(GamePhase.Battle)) {
                     if (!opponentMap.shoot(null) || curPlayerTurn.getOpponentShipsPlacement().getShipsMap().isEmpty()) {
+                        if (curPlayerTurn.getOpponentShipsPlacement().getShipsMap().isEmpty()) {
+                            gamePhase = GamePhase.GameOver;
+                        }
                         curPlayerTurn.endTurn();
                         curPlayerTurn = null;
                         ownMap.cleanMap();
                         opponentMap.cleanMap();
                         middlePanel.repaint();
-                        if (curPlayerTurn.getOpponentShipsPlacement().getShipsMap().isEmpty()) {
-                            gamePhase = GamePhase.GameOver;
-                        }
                     }
                 }
             }
