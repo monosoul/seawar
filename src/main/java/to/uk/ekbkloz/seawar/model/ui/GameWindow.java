@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
@@ -23,11 +24,17 @@ import to.uk.ekbkloz.seawar.model.ships.Ship;
 
 public class GameWindow extends JFrame {
     private static final long serialVersionUID = -202136959207752221L;
-    private final GamePhase gamePhase;
+    private GamePhase gamePhase;
     private Player curPlayerTurn;
     private final JPanel middlePanel;
     private final JPanel bottomPanel;
     private final GridBagConstraints gridBagConstraints;
+    private int turnsCount = 0;
+    
+    protected SeaMap ownMap;
+    protected SeaMap opponentMap;
+    protected ShipsAdditionPanel shipsAdditionPanel;
+    protected JLabel information;
 
     public GameWindow() {
         this.setTitle("Sea War");
@@ -50,6 +57,40 @@ public class GameWindow extends JFrame {
         gridBagConstraints.ipady = 0;
         gridBagConstraints.ipadx = 400;
         
+        //поле с информацией
+        information = new JLabel();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        middlePanel.add(information, gridBagConstraints);
+        
+        //поле игрока
+        ownMap = new SeaMap();
+        gridBagConstraints.ipady = 400;
+        gridBagConstraints.ipadx = 400;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        middlePanel.add(ownMap, gridBagConstraints);
+        
+        //поле противника
+        opponentMap = new SeaMap();
+        gridBagConstraints.ipady = 400;
+        gridBagConstraints.ipadx = 400;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        middlePanel.add(opponentMap, gridBagConstraints);
+        
+        //кнопки добавления кораблей
+        shipsAdditionPanel = new ShipsAdditionPanel();
+        gridBagConstraints.ipady = 0;
+        gridBagConstraints.ipadx = 400;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        middlePanel.add(shipsAdditionPanel, gridBagConstraints);
+        
         //нижняя панель
         bottomPanel = new JPanel(new BorderLayout());
         this.add(bottomPanel, BorderLayout.SOUTH);
@@ -63,9 +104,17 @@ public class GameWindow extends JFrame {
                     System.out.println("Вы добавили не все корабли!");
                 }
                 else {
-                    middlePanel.removeAll();
                     curPlayerTurn.endTurn();
                     curPlayerTurn = null;
+                    ownMap.cleanMap();
+                    opponentMap.cleanMap();
+                    if (turnsCount >= 2) {
+                        shipsAdditionEndButton.setEnabled(false);
+                        shipsAdditionEndButton.setVisible(false);
+                        shipsAdditionPanel.setEnabled(false);
+                        shipsAdditionPanel.setVisible(false);
+                        gamePhase = GamePhase.Battle;
+                    }
                     middlePanel.repaint();
                 }
             }
@@ -95,24 +144,24 @@ public class GameWindow extends JFrame {
                     if (e.getButton() == MouseEvent.BUTTON1) {
                         Ship ship = null;;
 
-                        if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd() != null) {
-                            if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd().equals(Carrier.class)) {
+                        if (shipsAdditionPanel.getShipToAdd() != null) {
+                            if (shipsAdditionPanel.getShipToAdd().equals(Carrier.class)) {
                                 ship = curPlayerTurn.getCarrier();
                             }
-                            if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd().equals(Battleship.class)) {
+                            if (shipsAdditionPanel.getShipToAdd().equals(Battleship.class)) {
                                 ship = curPlayerTurn.getBattleship();
                             }
-                            if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd().equals(Cruiser.class)) {
+                            if (shipsAdditionPanel.getShipToAdd().equals(Cruiser.class)) {
                                 ship = curPlayerTurn.getCruiser();
                             }
-                            if (curPlayerTurn.getShipsAdditionPanel().getShipToAdd().equals(Destroyer.class)) {
+                            if (shipsAdditionPanel.getShipToAdd().equals(Destroyer.class)) {
                                 ship = curPlayerTurn.getDestroyer();
                             }
                         }
                         
                         if (ship != null) {
-                            if (curPlayerTurn.getOwnMap().checkShipPlacement(ship, null)) {
-                                curPlayerTurn.getOwnMap().placeShip(ship);
+                            if (ownMap.checkShipPlacement(ship, null)) {
+                                ownMap.placeShip(ship);
                             }
                             else {
                                 curPlayerTurn.returnShip(ship);
@@ -120,13 +169,25 @@ public class GameWindow extends JFrame {
                         }
                     }
                     if (e.getButton() == MouseEvent.BUTTON2) {
-                        curPlayerTurn.getOwnMap().rotateShip();
+                        ownMap.rotateShip();
                     }
                     if (e.getButton() == MouseEvent.BUTTON3) {
-                        final Ship ship = curPlayerTurn.getOwnMap().removeShip();
+                        final Ship ship = ownMap.removeShip();
                         
                         if (ship != null) {
                             curPlayerTurn.returnShip(ship);
+                        }
+                    }
+                }
+                if (gamePhase.equals(GamePhase.Battle)) {
+                    if (!opponentMap.shoot(null) || curPlayerTurn.getOpponentShipsPlacement().getShipsMap().isEmpty()) {
+                        curPlayerTurn.endTurn();
+                        curPlayerTurn = null;
+                        ownMap.cleanMap();
+                        opponentMap.cleanMap();
+                        middlePanel.repaint();
+                        if (curPlayerTurn.getOpponentShipsPlacement().getShipsMap().isEmpty()) {
+                            gamePhase = GamePhase.GameOver;
                         }
                     }
                 }
@@ -137,39 +198,23 @@ public class GameWindow extends JFrame {
         this.setVisible(true);
     }
     
-    public void initializeMap (final Player player) {
-        //поле с информацией
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        middlePanel.add(player.getInformation(), gridBagConstraints);
-        
-        //игровое поле
-        gridBagConstraints.ipady = 400;
-        gridBagConstraints.ipadx = 400;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        middlePanel.add(player.getOwnMap(), gridBagConstraints);
-        
-        //поле противника
-        gridBagConstraints.ipady = 400;
-        gridBagConstraints.ipadx = 400;
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        middlePanel.add(player.getOpponentMap(), gridBagConstraints);
-        
-        //кнопки добавления кораблей
-        gridBagConstraints.ipady = 0;
-        gridBagConstraints.ipadx = 400;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        middlePanel.add(player.getShipsAdditionPanel(), gridBagConstraints);
-        
+    public void invokeTurn (final Player player) {
         curPlayerTurn = player;
+        curPlayerTurn.beginTurn();
+        ownMap.drawMap(curPlayerTurn.getOwnShipsPlacement());
+        if(gamePhase.equals(GamePhase.Battle)) {
+            ownMap.setEnabled(false);
+        }
+        if(!gamePhase.equals(GamePhase.ShipAddtion)) {
+            opponentMap.drawMap(curPlayerTurn.getOpponentShipsPlacement());
+        }
         middlePanel.repaint();
+        turnsCount++;
     }
 
+    public GamePhase getGamePhase() {
+        return gamePhase;
+    }
+
+    
 }

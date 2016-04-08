@@ -3,25 +3,23 @@ package to.uk.ekbkloz.seawar.model.players;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import javax.swing.JLabel;
-
+import to.uk.ekbkloz.seawar.model.ShipsPlacement;
 import to.uk.ekbkloz.seawar.model.ships.Battleship;
 import to.uk.ekbkloz.seawar.model.ships.Carrier;
 import to.uk.ekbkloz.seawar.model.ships.Cruiser;
 import to.uk.ekbkloz.seawar.model.ships.Destroyer;
 import to.uk.ekbkloz.seawar.model.ships.Ship;
 import to.uk.ekbkloz.seawar.model.ui.SeaMap;
-import to.uk.ekbkloz.seawar.model.ui.ShipsAdditionPanel;
 
 public abstract class Player {
     protected Queue<Carrier>    carriers    = new ArrayBlockingQueue<Carrier>(Carrier.MAXAMOUNT);
     protected Queue<Battleship> battleships = new ArrayBlockingQueue<Battleship>(Battleship.MAXAMOUNT);
     protected Queue<Cruiser>    cruisers    = new ArrayBlockingQueue<Cruiser>(Cruiser.MAXAMOUNT);
     protected Queue<Destroyer>  destroyers  = new ArrayBlockingQueue<Destroyer>(Destroyer.MAXAMOUNT);
-    protected SeaMap ownMap;
-    protected SeaMap opponentMap;
-    protected ShipsAdditionPanel shipsAdditionPanel;
-    protected JLabel information;
+    
+    protected ShipsPlacement ownShipsPlacement;
+    protected ShipsPlacement opponentShipsPlacement;
+    
     protected boolean turnEnded;
     
     public Player(){
@@ -39,61 +37,37 @@ public abstract class Player {
                 destroyers.offer(new Destroyer());
             }
         }
-        ownMap = new SeaMap();
-        opponentMap = new SeaMap();
-        opponentMap.setEnabled(false);
-        opponentMap.setVisible(false);
-        shipsAdditionPanel = new ShipsAdditionPanel();
-        information = new JLabel();
-        information.setText("Добавление кораблей");
+        
+        ownShipsPlacement = new ShipsPlacement(SeaMap.MAPSIZE);
+        opponentShipsPlacement = new ShipsPlacement(SeaMap.MAPSIZE);
+        
         turnEnded = false;
     }
     
+    
+    
+    public ShipsPlacement getOwnShipsPlacement() {
+        return ownShipsPlacement;
+    }
+
+
+
+    public ShipsPlacement getOpponentShipsPlacement() {
+        return opponentShipsPlacement;
+    }
+    
+
     public void endTurn() {
-        ownMap.setEnabled(false);
-        ownMap.setVisible(false);
-        opponentMap.setEnabled(false);
-        opponentMap.setVisible(false);
-        if (shipsAdditionPanel.isEnabled()) {
-            shipsAdditionPanel.setEnabled(false);
-            shipsAdditionPanel.setVisible(false);
-        }
-        information.setVisible(false);
         turnEnded = true;
     }
     
     public void beginTurn() {
-        ownMap.setEnabled(true);
-        ownMap.setVisible(true);
-        opponentMap.setEnabled(true);
-        opponentMap.setVisible(true);
-        information.setVisible(true);
         turnEnded = false;
     }
     
 
     public boolean isTurnEnded() {
         return turnEnded;
-    }
-
-    public SeaMap getOwnMap() {
-        return ownMap;
-    }
-
-
-
-    public SeaMap getOpponentMap() {
-        return opponentMap;
-    }
-
-
-
-    public ShipsAdditionPanel getShipsAdditionPanel() {
-        return shipsAdditionPanel;
-    }
-
-    public JLabel getInformation() {
-        return information;
     }
 
     public Carrier getCarrier() {
