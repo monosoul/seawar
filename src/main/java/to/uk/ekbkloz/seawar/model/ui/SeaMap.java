@@ -84,6 +84,24 @@ public class SeaMap extends JPanel {
         return false;
     }
     
+    private Boolean checkNearbyFields(final Coordinates currentField, final Coordinates previousField) {
+        boolean placeable = true;
+        for (final ShipOrientation orientation : ShipOrientation.values()) {
+            final Coordinates nextField = new Coordinates(currentField.getX()+orientation.getXStep(), currentField.getY()+orientation.getYStep());
+            System.out.println("nextField: " + nextField);
+            if (nextField.getX() < SeaMap.MAPSIZE && nextField.getX() >= 0 && nextField.getY() < SeaMap.MAPSIZE && nextField.getY() >= 0) {
+                if (!nextField.equals(previousField)) {
+                    if (!checkField(nextField, FieldStatus.SHIP)) {
+                        placeable = false;
+                        break;
+                    }
+                }
+            }
+        }
+        System.out.println("placeable = " + placeable);
+        return placeable;
+    }
+    
     
     public void setField(final Coordinates coordinates, final FieldStatus newStatus) {
         shipsPlacement.getFields()[coordinates.getX()][coordinates.getY()] = newStatus;
@@ -134,26 +152,39 @@ public class SeaMap extends JPanel {
                 int availableFields;
                 int x;
                 int y;
+                Coordinates previousCoordinates;
                 if (ship.getFaceCoordinates() != null) {
                     availableFields = 1;
                     System.out.println("Корабль уже есть на карте");
                     x = faceCoordinates.getX() + orientation.getXStep();
                     y = faceCoordinates.getY() + orientation.getYStep();
+                    previousCoordinates = faceCoordinates;
                 }
                 else {
                     availableFields = 0;
                     x = faceCoordinates.getX();
                     y = faceCoordinates.getY();
+                    previousCoordinates = null;
                 }
+                
                 while(Math.abs(faceCoordinates.getX() - x) < ship.getSize() && Math.abs(faceCoordinates.getY() - y) < ship.getSize()) {
-                    if(!checkField(new Coordinates(x, y), FieldStatus.SHIP)) {
+                    final Coordinates currentCoordinates = new Coordinates(x, y);
+                    if(!checkField(currentCoordinates, FieldStatus.SHIP)) {
                         break;
                     }
                     else {
-                        availableFields++;
+                        if (!checkNearbyFields(currentCoordinates, previousCoordinates)) {
+                            break;
+                        }
+                        else {
+                            availableFields++;
+                        }
+                        
                     }
                     System.out.println("тест (" + x + ";" + y + ")");
-                        
+                    
+                    previousCoordinates = currentCoordinates;
+                    
                     x+=orientation.getXStep();
                     y+=orientation.getYStep();
                 }

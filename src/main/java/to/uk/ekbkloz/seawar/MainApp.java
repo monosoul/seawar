@@ -44,7 +44,7 @@ public class MainApp {
             w.invokeTurn(players[i]);
             System.out.println("Ход игрока " + (i + 1));
             while(!players[i].isTurnEnded()) {
-                Thread.sleep(200);
+                Thread.sleep(400);
             }
             shotsMapBuffer = players[i].getOpponentShipsPlacement().getShotsMap();
             i++;

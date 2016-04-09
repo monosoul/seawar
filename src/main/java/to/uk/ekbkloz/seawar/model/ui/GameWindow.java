@@ -106,6 +106,7 @@ public class GameWindow extends JFrame {
                 else {
                     curPlayerTurn.endTurn();
                     curPlayerTurn = null;
+                    shipsAdditionPanel.reset();
                     ownMap.cleanMap();
                     opponentMap.cleanMap();
                     if (turnsCount >= 2) {

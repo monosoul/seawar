@@ -96,6 +96,8 @@ public class ShipsAdditionPanel extends JPanel {
         return destroyerAddButton;
     }
     
-    
+    public void reset() {
+        shipToAdd = null;
+    }
 
 }
