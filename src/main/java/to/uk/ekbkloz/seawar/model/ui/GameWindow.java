@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,8 +15,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import to.uk.ekbkloz.seawar.model.Coordinates;
 import to.uk.ekbkloz.seawar.model.GamePhase;
-import to.uk.ekbkloz.seawar.model.players.Player;
+import to.uk.ekbkloz.seawar.model.Player;
 import to.uk.ekbkloz.seawar.model.ships.Battleship;
 import to.uk.ekbkloz.seawar.model.ships.Carrier;
 import to.uk.ekbkloz.seawar.model.ships.Cruiser;
@@ -34,6 +36,7 @@ public class GameWindow extends JFrame {
     protected SeaMap ownMap;
     protected SeaMap opponentMap;
     protected ShipsAdditionPanel shipsAdditionPanel;
+    protected final JButton shipsAdditionEndButton;
     protected JLabel information;
 
     public GameWindow() {
@@ -96,7 +99,7 @@ public class GameWindow extends JFrame {
         this.add(bottomPanel, BorderLayout.SOUTH);
         
         //кнопка завершения добавления кораблей
-        final JButton shipsAdditionEndButton = new JButton("Готово!");
+        shipsAdditionEndButton = new JButton("Готово!");
         shipsAdditionEndButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -202,15 +205,84 @@ public class GameWindow extends JFrame {
     public void invokeTurn (final Player player) {
         curPlayerTurn = player;
         curPlayerTurn.beginTurn();
-        ownMap.drawMap(curPlayerTurn.getOwnShipsPlacement());
+        ownMap.drawMap(curPlayerTurn.getOwnShipsPlacement(), player.getPlayerType());
+        if(gamePhase.equals(GamePhase.ShipAddtion)) {
+            information.setText("Игрок " + curPlayerTurn.getName() + " размещает корабли");
+        }
         if(gamePhase.equals(GamePhase.Battle)) {
+            information.setText("Ход игрока " + curPlayerTurn.getName());
             ownMap.setEnabled(false);
         }
         if(!gamePhase.equals(GamePhase.ShipAddtion)) {
-            opponentMap.drawMap(curPlayerTurn.getOpponentShipsPlacement());
+            opponentMap.drawMap(curPlayerTurn.getOpponentShipsPlacement(), player.getPlayerType());
         }
         middlePanel.repaint();
         turnsCount++;
+        
+        if (curPlayerTurn.getPlayerType().equals(Player.PlayerType.AI) && gamePhase.equals(GamePhase.ShipAddtion)) {
+            final Random rand = new Random();
+            final int maxTries = SeaMap.MAPSIZE * SeaMap.MAPSIZE;
+            final int allMaxTries = curPlayerTurn.getShipsCount() * maxTries;
+            int allTriesCounter = 1;
+            boolean allShipsPlaced = false;
+            while(!allShipsPlaced) {
+                while(curPlayerTurn.getShipsCount() > 0 && allTriesCounter <= allMaxTries) {
+                    //placing AI ships
+                    final Ship ship = curPlayerTurn.getShip();
+                    boolean placed = false;
+                    int triesCounter = 1;
+                    while(!placed && triesCounter <= maxTries) {
+                        final Coordinates newCoordinates = new Coordinates(rand.nextInt(SeaMap.MAPSIZE), rand.nextInt(SeaMap.MAPSIZE));
+                        if (ownMap.checkShipPlacement(ship, newCoordinates)) {
+                            ownMap.placeShip(ship);
+                            placed = true;
+                        }
+                        triesCounter++;
+                        allTriesCounter++;
+                    }
+                    if (!placed) {
+                        curPlayerTurn.returnShip(ship);
+                    }
+                }
+                if (curPlayerTurn.getShipsCount() > 0) {
+                    ownMap.reset();
+                    curPlayerTurn.resetAllShips();
+                }
+                else {
+                    allShipsPlaced = true;
+                }
+            }
+            
+            
+            curPlayerTurn.endTurn();
+            curPlayerTurn = null;
+            ownMap.cleanMap();
+            opponentMap.cleanMap();
+            if (turnsCount >= 2) {
+                shipsAdditionEndButton.setEnabled(false);
+                shipsAdditionEndButton.setVisible(false);
+                shipsAdditionPanel.setEnabled(false);
+                shipsAdditionPanel.setVisible(false);
+                gamePhase = GamePhase.Battle;
+            }
+            return;
+        }
+        
+        if (curPlayerTurn.getPlayerType().equals(Player.PlayerType.AI) && gamePhase.equals(GamePhase.Battle)) {
+            final Random rand = new Random();
+            while (opponentMap.shoot(new Coordinates(rand.nextInt(SeaMap.MAPSIZE), rand.nextInt(SeaMap.MAPSIZE))) && !curPlayerTurn.getOpponentShipsPlacement().getShipsMap().isEmpty()) {
+                
+            }
+            if (curPlayerTurn.getOpponentShipsPlacement().getShipsMap().isEmpty()) {
+                gamePhase = GamePhase.GameOver;
+            }
+            curPlayerTurn.endTurn();
+            curPlayerTurn = null;
+            ownMap.cleanMap();
+            opponentMap.cleanMap();
+            middlePanel.repaint();
+            return;
+        }
     }
 
     public GamePhase getGamePhase() {

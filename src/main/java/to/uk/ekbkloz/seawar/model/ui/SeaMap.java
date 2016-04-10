@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import to.uk.ekbkloz.seawar.model.Coordinates;
 import to.uk.ekbkloz.seawar.model.FieldStatus;
+import to.uk.ekbkloz.seawar.model.Player;
 import to.uk.ekbkloz.seawar.model.ShipOrientation;
 import to.uk.ekbkloz.seawar.model.ShipsPlacement;
 import to.uk.ekbkloz.seawar.model.ships.Ship;
@@ -38,7 +39,7 @@ public class SeaMap extends JPanel {
         */
     }
     
-    public void drawMap(final ShipsPlacement shipsPlacement) {
+    public void drawMap(final ShipsPlacement shipsPlacement, final Player.PlayerType playerType) {
         this.shipsPlacement = shipsPlacement;
         if (shipsPlacement.getShipsMap().size() <= 0 || !this.shipsPlacement.isFieldsFilled()) {
             for (int i = 0; i < MAPSIZE; i++) {
@@ -52,8 +53,10 @@ public class SeaMap extends JPanel {
             this.shipsPlacement.getFields()[entry.getKey().getX()][entry.getKey().getY()] = entry.getValue();
         }
         
-        this.setEnabled(true);
-        this.setVisible(true);
+        if (playerType.equals(Player.PlayerType.Human)) {
+            this.setEnabled(true);
+            this.setVisible(true);
+        }
         this.repaint();
     }
     
@@ -70,6 +73,7 @@ public class SeaMap extends JPanel {
         if (coordinates.getX() >= SeaMap.MAPSIZE || coordinates.getX() < 0 || coordinates.getY() >= SeaMap.MAPSIZE || coordinates.getY() < 0) {
             return false;
         }
+        System.out.println("Check field: " + coordinates + "; Status: " + shipsPlacement.getFields()[coordinates.getX()][coordinates.getY()].name());
         switch(shipsPlacement.getFields()[coordinates.getX()][coordinates.getY()]) {
             case WATER: if (newStatus.equals(FieldStatus.SHIP) || newStatus.equals(FieldStatus.MISS)) {
                           return true;
@@ -89,8 +93,11 @@ public class SeaMap extends JPanel {
         for (final ShipOrientation orientation : ShipOrientation.values()) {
             final Coordinates nextField = new Coordinates(currentField.getX()+orientation.getXStep(), currentField.getY()+orientation.getYStep());
             System.out.println("nextField: " + nextField);
+            //если в пределах карты
             if (nextField.getX() < SeaMap.MAPSIZE && nextField.getX() >= 0 && nextField.getY() < SeaMap.MAPSIZE && nextField.getY() >= 0) {
+                //если не предыдущее поле
                 if (!nextField.equals(previousField)) {
+                    //если нельзя разместить корабль
                     if (!checkField(nextField, FieldStatus.SHIP)) {
                         placeable = false;
                         break;
@@ -110,9 +117,6 @@ public class SeaMap extends JPanel {
     }
     
     public Boolean checkShipPlacement(final Ship ship, Coordinates faceCoordinates) {
-        if (!this.isVisible()) {
-            return false;
-        } 
         if (faceCoordinates == null) {
             faceCoordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
         }
@@ -204,9 +208,6 @@ public class SeaMap extends JPanel {
     }
 
     public void placeShip(final Ship ship) {
-        if (!this.isVisible()) {
-            return;
-        } 
         int x = ship.getFaceCoordinates().getX();
         int y = ship.getFaceCoordinates().getY();
         while(Math.abs(ship.getFaceCoordinates().getX() - x) < ship.getSize() && Math.abs(ship.getFaceCoordinates().getY() - y) < ship.getSize()) {
@@ -220,9 +221,6 @@ public class SeaMap extends JPanel {
     }
     
     public void rotateShip() {
-        if (!this.isVisible()) {
-            return;
-        } 
         final Coordinates coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
         
         try{
@@ -252,9 +250,6 @@ public class SeaMap extends JPanel {
     }
     
     public Ship removeShip() {
-        if (!this.isVisible()) {
-            return null;
-        } 
         final Coordinates coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
             
         try{
@@ -283,9 +278,6 @@ public class SeaMap extends JPanel {
     }
 
     public boolean shoot(Coordinates coordinates) {
-        if (!this.isVisible()) {
-            return false;
-        }
         if (coordinates == null) {
             coordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
         }
@@ -305,6 +297,17 @@ public class SeaMap extends JPanel {
                 return false;
             }
         }
+    }
+    
+    public void reset() {
+        for (int i = 0; i < MAPSIZE; i++) {
+            for (int j = 0; j < MAPSIZE; j++) {
+                this.shipsPlacement.getFields()[i][j] = FieldStatus.WATER;
+            }
+        }
+        this.shipsPlacement.setFieldsFilled(false);
+        this.shipsPlacement.getShipsMap().clear();
+        this.shipsPlacement.getShotsMap().clear();
     }
     
     @Override
