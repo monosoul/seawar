@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import to.uk.ekbkloz.seawar.model.Coordinates;
 import to.uk.ekbkloz.seawar.model.FieldStatus;
+import to.uk.ekbkloz.seawar.model.Orientation;
 import to.uk.ekbkloz.seawar.model.Player;
 import to.uk.ekbkloz.seawar.model.ShipOrientation;
 import to.uk.ekbkloz.seawar.model.ShipsPlacement;
@@ -88,15 +89,16 @@ public class SeaMap extends JPanel {
         return false;
     }
     
-    private Boolean checkNearbyFields(final Coordinates currentField, final Coordinates previousField) {
+    private Boolean checkNearbyFields(final Coordinates currentField, final Ship ship) {
         boolean placeable = true;
-        for (final ShipOrientation orientation : ShipOrientation.values()) {
+        for (final Orientation orientation : Orientation.values()) {
             final Coordinates nextField = new Coordinates(currentField.getX()+orientation.getXStep(), currentField.getY()+orientation.getYStep());
             System.out.println("nextField: " + nextField);
             //если в пределах карты
             if (nextField.getX() < SeaMap.MAPSIZE && nextField.getX() >= 0 && nextField.getY() < SeaMap.MAPSIZE && nextField.getY() >= 0) {
                 //если не предыдущее поле
-                if (!nextField.equals(previousField)) {
+                //if (!nextField.equals(previousField)) {
+                if (!ship.equals(shipsPlacement.getShipsMap().get(nextField))) {
                     //если нельзя разместить корабль
                     if (!checkField(nextField, FieldStatus.SHIP)) {
                         placeable = false;
@@ -156,19 +158,16 @@ public class SeaMap extends JPanel {
                 int availableFields;
                 int x;
                 int y;
-                Coordinates previousCoordinates;
                 if (ship.getFaceCoordinates() != null) {
                     availableFields = 1;
                     System.out.println("Корабль уже есть на карте");
                     x = faceCoordinates.getX() + orientation.getXStep();
                     y = faceCoordinates.getY() + orientation.getYStep();
-                    previousCoordinates = faceCoordinates;
                 }
                 else {
                     availableFields = 0;
                     x = faceCoordinates.getX();
                     y = faceCoordinates.getY();
-                    previousCoordinates = null;
                 }
                 
                 while(Math.abs(faceCoordinates.getX() - x) < ship.getSize() && Math.abs(faceCoordinates.getY() - y) < ship.getSize()) {
@@ -177,7 +176,7 @@ public class SeaMap extends JPanel {
                         break;
                     }
                     else {
-                        if (!checkNearbyFields(currentCoordinates, previousCoordinates)) {
+                        if (!checkNearbyFields(currentCoordinates, ship)) {
                             break;
                         }
                         else {
@@ -186,8 +185,6 @@ public class SeaMap extends JPanel {
                         
                     }
                     System.out.println("тест (" + x + ";" + y + ")");
-                    
-                    previousCoordinates = currentCoordinates;
                     
                     x+=orientation.getXStep();
                     y+=orientation.getYStep();
