@@ -15,16 +15,17 @@ import to.uk.ekbkloz.seawar.model.ShipOrientation;
 import to.uk.ekbkloz.seawar.model.ShipsPlacement;
 import to.uk.ekbkloz.seawar.model.ships.Ship;
 
+//поле с кораблями
 public class SeaMap extends JPanel {
 
     private static final long serialVersionUID = -6039792179649871752L;
        
-    public static final int MAPSIZE = 10;
+    public static final int MAPSIZE = 10; //размер поля
     
-    private ShipsPlacement shipsPlacement = null;
+    private ShipsPlacement shipsPlacement = null; //карта размещения кораблей
 
 
-
+    //при создании поле - пустое
     public SeaMap() {
         this.setBackground(Color.WHITE);
         this.setSize(400, 400);
@@ -39,8 +40,10 @@ public class SeaMap extends JPanel {
         */
     }
     
+    //метод для отрисовки поля в соответствии с картой размещения кораблей
     public void drawMap(final ShipsPlacement shipsPlacement, final Player.PlayerType playerType) {
         this.shipsPlacement = shipsPlacement;
+        //рисуем поля по "карте" полей
         if (shipsPlacement.getShipsMap().size() <= 0 || !this.shipsPlacement.isFieldsFilled()) {
             for (int i = 0; i < MAPSIZE; i++) {
                 for (int j = 0; j < MAPSIZE; j++) {
@@ -49,10 +52,11 @@ public class SeaMap extends JPanel {
             }
             this.shipsPlacement.setFieldsFilled(true);
         }
+        //рисуем попадания/промахи
         for (final Entry<Coordinates, FieldStatus> entry : this.shipsPlacement.getShotsMap().entrySet()) {
             this.shipsPlacement.getFields()[entry.getKey().getX()][entry.getKey().getY()] = entry.getValue();
         }
-        
+        //если текущий игрок - человек, то включаем поле
         if (playerType.equals(Player.PlayerType.Human)) {
             this.setEnabled(true);
             //this.setVisible(true);
@@ -60,40 +64,53 @@ public class SeaMap extends JPanel {
         this.repaint();
     }
     
+    //метод очистки поля
     public void cleanMap() {
+        //если присутствует карта размещения кораблей
         if (this.shipsPlacement != null) {
+            //то делаем поле не активным
             this.setEnabled(false);
             //this.setVisible(false);
+            //рисуем пустое поле
             shipsPlacement = null;
             super.paintComponent(this.getGraphics());
         }
     }
 
-    
+    //метод проверки поля
     public Boolean checkField(final Coordinates coordinates, final FieldStatus newStatus) {
+        //если координаты за пределами карты, то возвращаем false
         if (coordinates.getX() >= SeaMap.MAPSIZE || coordinates.getX() < 0 || coordinates.getY() >= SeaMap.MAPSIZE || coordinates.getY() < 0) {
             return false;
         }
-        System.out.println("Check field: " + coordinates + "; Status: " + shipsPlacement.getFields()[coordinates.getX()][coordinates.getY()].name());
+        //System.out.println("Check field: " + coordinates + "; Status: " + shipsPlacement.getFields()[coordinates.getX()][coordinates.getY()].name());
         switch(shipsPlacement.getFields()[coordinates.getX()][coordinates.getY()]) {
+            //если текущий статус поля - вода
             case WATER: if (newStatus.equals(FieldStatus.SHIP) || newStatus.equals(FieldStatus.MISS)) {
+                        //если потенциальный статус поля - корабль или промах, то возвращаем true
                           return true;
                         }
                         break;
+            //если текущий статус поля - корабль
             case SHIP:  if (newStatus.equals(FieldStatus.HIT)) {
+                        //если потенциальный статус поля - попадание, то возвращаем true
                           return true;
                         }
                         break;
             default:    break;
         }
+        //в остальных случаях возвращаем false
         return false;
     }
     
+    //метод проверки соседних полей
     private Boolean checkNearbyFields(final Coordinates currentField, final Ship ship) {
         boolean placeable = true;
+        //перебираем все направления размещения кораблей
         for (final ShipOrientation orientation : ShipOrientation.values()) {
+            //получаем потенциальные координаты следующего поля
             final Coordinates nextField = new Coordinates(currentField.getX()+orientation.getXStep(), currentField.getY()+orientation.getYStep());
-            System.out.println("nextField: " + nextField);
+            //System.out.println("nextField: " + nextField);
             //если в пределах карты
             if (nextField.getX() < SeaMap.MAPSIZE && nextField.getX() >= 0 && nextField.getY() < SeaMap.MAPSIZE && nextField.getY() >= 0) {
                 //если не поле, занятое текущим кораблём
@@ -106,17 +123,23 @@ public class SeaMap extends JPanel {
                     else {
                         //проверяем диагонали
                         final Coordinates diagFields[] = new Coordinates[2];
+                        //если сдвиг по отношению к предыдущему полю - по вертикали
                         if (orientation.getXStep() == 0) {
                             diagFields[0] = new Coordinates(nextField.getX() + 1, nextField.getY());
                             diagFields[1] = new Coordinates(nextField.getX() - 1, nextField.getY());
                         }
+                        //если сдвиг по отношению к предыдущему полю - по горизонтали
                         if (orientation.getYStep() == 0) {
                             diagFields[0] = new Coordinates(nextField.getX(), nextField.getY() + 1);
                             diagFields[1] = new Coordinates(nextField.getX(), nextField.getY() - 1);
                         }
+                        // перебираем потенциальные поля по диагоналям
                         for (final Coordinates diagField : diagFields) {
+                            //если в пределах карты
                             if (diagField.getX() < SeaMap.MAPSIZE && diagField.getX() >= 0 && diagField.getY() < SeaMap.MAPSIZE && diagField.getY() >= 0) {
+                                //если не поле, занятое текущим кораблём
                                 if (!ship.equals(shipsPlacement.getShipsMap().get(diagField))) {
+                                    //если нельзя разместить корабль
                                     if (!checkField(diagField, FieldStatus.SHIP)) {
                                         placeable = false;
                                         break;
@@ -128,51 +151,60 @@ public class SeaMap extends JPanel {
                 }
             }
         }
-        System.out.println("placeable = " + placeable);
+        //System.out.println("placeable = " + placeable);
         return placeable;
     }
     
-    
+    //метод изменения статуса поля
     public void setField(final Coordinates coordinates, final FieldStatus newStatus) {
         shipsPlacement.getFields()[coordinates.getX()][coordinates.getY()] = newStatus;
-        System.out.println(coordinates.toString() + " - " + newStatus.name());
+        //System.out.println(coordinates.toString() + " - " + newStatus.name());
         this.repaint();
     }
     
+    //метод проверки возможности размещения корабля
     public Boolean checkShipPlacement(final Ship ship, Coordinates faceCoordinates) {
+        //если методу не переданы координаты носа корабля, то берём их из текущего расположения курсора мыши
         if (faceCoordinates == null) {
             faceCoordinates = new Coordinates((int)(this.getMousePosition().getX() / 40),(int)(this.getMousePosition().getY() / 40));
         }
+        //если координаты за пределами карты, то возвращаем false
         if (faceCoordinates.getX() >= SeaMap.MAPSIZE || faceCoordinates.getX() < 0 || faceCoordinates.getY() >= SeaMap.MAPSIZE || faceCoordinates.getY() < 0) {
             return false;
         }
+        //получаем коллекцию возможных направлений размещения корабля
         final List<ShipOrientation> shipOrientations = Arrays.asList(ShipOrientation.values());
-        System.out.println("shipOrientations.size() = " + shipOrientations.size());
-        int orientationIndex;
+        //System.out.println("shipOrientations.size() = " + shipOrientations.size());
+        int orientationIndex; //индекс текущего направления
+        //если переданный объект корабля уже размещён на карте
         if (ship.getOrientation() != null) {
+            //то получаем индекс текущего направления корабля
             orientationIndex = shipOrientations.indexOf(ship.getOrientation());
         }
+        //если корабль ещё не размещён на карте
         else {
+            //то индекс текущего направления - 0, т.е. первое направление по списку
             orientationIndex = 0;
         }
-        final int initialOrientationIndex = orientationIndex;
-        int iterations = 0;
+        int iterations = 0; //переменная с количеством итераций
         
-        //for(final ShipOrientation orientation : shipOrientations) {
+        //пока итераций меньше, чем количество направлений
         while(iterations<shipOrientations.size()) {
+            //если индекс направления больше допустимого, то сбрасываем его на 0 (т.е. первое направление). Нужно в случаях, когда перебор начинается не с первого направления.
             if (orientationIndex >= shipOrientations.size()) {
                 orientationIndex = 0;
             }
-            System.out.println("initialOrientationIndex = " + initialOrientationIndex);
-            System.out.println("orientationIndex = " + orientationIndex);
+            //System.out.println("initialOrientationIndex = " + initialOrientationIndex);
+            //System.out.println("orientationIndex = " + orientationIndex);
             
-            final ShipOrientation orientation = shipOrientations.get(orientationIndex);
+            final ShipOrientation orientation = shipOrientations.get(orientationIndex); //текущее направление
             
+            //получаем потенциальные координаты кормы корабля
             final Coordinates backCoordinates = new Coordinates(faceCoordinates.getX() + (ship.getSize()-1)*orientation.getXStep(), faceCoordinates.getY() + (ship.getSize()-1)*orientation.getYStep());
             
-            System.out.println("Orientation: " + orientation.name());
-            System.out.println("faceCoordinates: (" + faceCoordinates.getX() + ";" + faceCoordinates.getY() + ")");
-            System.out.println("backCoordinates: (" + backCoordinates.getX() + ";" + backCoordinates.getY() + ")");
+            //System.out.println("Orientation: " + orientation.name());
+            //System.out.println("faceCoordinates: (" + faceCoordinates.getX() + ";" + faceCoordinates.getY() + ")");
+            //System.out.println("backCoordinates: (" + backCoordinates.getX() + ";" + backCoordinates.getY() + ")");
             
             if (backCoordinates.getX() < MAPSIZE && backCoordinates.getX() >= 0 && backCoordinates.getY() < MAPSIZE && backCoordinates.getY() >= 0) {
                 // Проверяем возможность поставить корабль
@@ -214,7 +246,6 @@ public class SeaMap extends JPanel {
                     System.out.println("Подходящее место найдено");
                     ship.setOrientation(orientation);
                     ship.setFaceCoordinates(faceCoordinates);
-                    ship.setBackCoordinates(backCoordinates);
                     return true;
                 }
             }
@@ -285,7 +316,6 @@ public class SeaMap extends JPanel {
                 y += ship.getOrientation().getYStep();
             }
             ship.setFaceCoordinates(null);
-            ship.setBackCoordinates(null);
             ship.setOrientation(null);
             return ship;
         }
@@ -340,7 +370,10 @@ public class SeaMap extends JPanel {
                       g.setColor(shipsPlacement.getFields()[i][j].getColor());
                     }
                     catch(final Exception e){
-                        e.printStackTrace();
+                        if (shipsPlacement != null) {
+                            g.setColor(shipsPlacement.getFields()[i][j].getColor());
+                        }
+                        //e.printStackTrace();
                     }
                     g.fillRect(i*40, j*40, 40, 40);
                 }

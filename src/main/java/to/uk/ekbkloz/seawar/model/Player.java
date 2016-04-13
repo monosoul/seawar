@@ -10,18 +10,20 @@ import to.uk.ekbkloz.seawar.model.ships.Destroyer;
 import to.uk.ekbkloz.seawar.model.ships.Ship;
 import to.uk.ekbkloz.seawar.model.ui.SeaMap;
 
+//объект игрока
 public class Player {
+    //очереди кораблей для удобного извлечения :)
     private final Queue<Carrier>    carriers    = new ArrayBlockingQueue<Carrier>(Carrier.MAXAMOUNT);
     private final Queue<Battleship> battleships = new ArrayBlockingQueue<Battleship>(Battleship.MAXAMOUNT);
     private final Queue<Cruiser>    cruisers    = new ArrayBlockingQueue<Cruiser>(Cruiser.MAXAMOUNT);
     private final Queue<Destroyer>  destroyers  = new ArrayBlockingQueue<Destroyer>(Destroyer.MAXAMOUNT);
     
-    private final ShipsPlacement ownShipsPlacement;
-    private final ShipsPlacement opponentShipsPlacement;
-    private final PlayerType playerType;
-    private final String name;
+    private final ShipsPlacement ownShipsPlacement; //карта размещения своих кораблей
+    private final ShipsPlacement opponentShipsPlacement; //карта размещения кораблей противника (для определния попаданий)
+    private final PlayerType playerType; //тип игрока
+    private final String name; //имя игрока
     
-    private boolean turnEnded;
+    private boolean turnEnded; //флаг завершения хода
     
     public Player(final PlayerType playerType, final String name){
         resetAllShips();

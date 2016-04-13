@@ -3,11 +3,11 @@ package to.uk.ekbkloz.seawar.model.ships;
 import to.uk.ekbkloz.seawar.model.Coordinates;
 import to.uk.ekbkloz.seawar.model.ShipOrientation;
 
+//класс кораблей
 public abstract class Ship {
-    protected Integer size;
-    protected ShipOrientation orientation = null;
-    protected Coordinates faceCoordinates = null;
-    protected Coordinates backCoordinates = null;
+    protected Integer size; //размер корабля (кол-во занимаемых полей)
+    protected ShipOrientation orientation = null; //ориентация корабля
+    protected Coordinates faceCoordinates = null; //координаты носа корабля (точки, от которой размещается корабль)
     
     
     public Integer getSize() {
@@ -36,20 +36,5 @@ public abstract class Ship {
     public void setFaceCoordinates(final Coordinates faceCoordinates) {
         this.faceCoordinates = faceCoordinates;
     }
-
-
-    public Coordinates getBackCoordinates() {
-        return backCoordinates;
-    }
-
-
-    public void setBackCoordinates(final Coordinates backCoordinates) {
-        this.backCoordinates = backCoordinates;
-    }
-    
-    
-    
-    
-
-    
+  
 }

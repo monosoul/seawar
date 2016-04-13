@@ -2,6 +2,7 @@ package to.uk.ekbkloz.seawar.model;
 
 import java.awt.Color;
 
+//перечисление статусов полей
 public enum FieldStatus {
     WATER(Color.BLUE),
     SHIP(Color.BLACK),

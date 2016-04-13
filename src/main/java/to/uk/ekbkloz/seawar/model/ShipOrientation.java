@@ -1,5 +1,6 @@
 package to.uk.ekbkloz.seawar.model;
 
+//перечисление возможных ориентаций кораблей, содержит шаги по осям X и Y для размещения кораблей  
 public enum ShipOrientation {
     NORTH(0,-1),
     EAST( 1, 0),

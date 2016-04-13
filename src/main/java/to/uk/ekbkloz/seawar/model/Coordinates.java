@@ -1,5 +1,6 @@
 package to.uk.ekbkloz.seawar.model;
 
+//класс для хранения координат
 public class Coordinates {
     private int x;
     private int y;
@@ -25,6 +26,7 @@ public class Coordinates {
         this.y = y;
     }
 
+    //корректная генерация хэша пригодится для получения объекта корабля из карты размещения кораблей по координатам
     @Override
     public int hashCode() {
         final int prime = 31;
