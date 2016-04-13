@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 
 import to.uk.ekbkloz.seawar.model.Coordinates;
 import to.uk.ekbkloz.seawar.model.FieldStatus;
-import to.uk.ekbkloz.seawar.model.Orientation;
 import to.uk.ekbkloz.seawar.model.Player;
 import to.uk.ekbkloz.seawar.model.ShipOrientation;
 import to.uk.ekbkloz.seawar.model.ShipsPlacement;
@@ -91,18 +90,39 @@ public class SeaMap extends JPanel {
     
     private Boolean checkNearbyFields(final Coordinates currentField, final Ship ship) {
         boolean placeable = true;
-        for (final Orientation orientation : Orientation.values()) {
+        for (final ShipOrientation orientation : ShipOrientation.values()) {
             final Coordinates nextField = new Coordinates(currentField.getX()+orientation.getXStep(), currentField.getY()+orientation.getYStep());
             System.out.println("nextField: " + nextField);
             //если в пределах карты
             if (nextField.getX() < SeaMap.MAPSIZE && nextField.getX() >= 0 && nextField.getY() < SeaMap.MAPSIZE && nextField.getY() >= 0) {
-                //если не предыдущее поле
-                //if (!nextField.equals(previousField)) {
+                //если не поле, занятое текущим кораблём
                 if (!ship.equals(shipsPlacement.getShipsMap().get(nextField))) {
                     //если нельзя разместить корабль
                     if (!checkField(nextField, FieldStatus.SHIP)) {
                         placeable = false;
                         break;
+                    }
+                    else {
+                        //проверяем диагонали
+                        final Coordinates diagFields[] = new Coordinates[2];
+                        if (orientation.getXStep() == 0) {
+                            diagFields[0] = new Coordinates(nextField.getX() + 1, nextField.getY());
+                            diagFields[1] = new Coordinates(nextField.getX() - 1, nextField.getY());
+                        }
+                        if (orientation.getYStep() == 0) {
+                            diagFields[0] = new Coordinates(nextField.getX(), nextField.getY() + 1);
+                            diagFields[1] = new Coordinates(nextField.getX(), nextField.getY() - 1);
+                        }
+                        for (final Coordinates diagField : diagFields) {
+                            if (diagField.getX() < SeaMap.MAPSIZE && diagField.getX() >= 0 && diagField.getY() < SeaMap.MAPSIZE && diagField.getY() >= 0) {
+                                if (!ship.equals(shipsPlacement.getShipsMap().get(diagField))) {
+                                    if (!checkField(diagField, FieldStatus.SHIP)) {
+                                        placeable = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
