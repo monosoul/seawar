@@ -16,30 +16,21 @@ public class MainApp {
     public static void main(final String[] args) throws InterruptedException {
         final Player players[] = new Player[2];
         players[0] = new Player(Player.PlayerType.Human, "Player");
-        players[1] = new Player(Player.PlayerType.AI, "AI");
+        players[1] = new Player(Player.PlayerType.AI, "Player 2");
         
         final GameWindow w = new GameWindow();
         
-        if (players[0].getPlayerType().equals(Player.PlayerType.AI)) {
-            System.out.println("Игрок " + players[0].getName() + " расставляет корабли");
-        }
-        else {
-            JOptionPane.showMessageDialog(w, "Игрок " + players[0].getName() + " расставляет корабли");
-        }
-        w.invokeTurn(players[0]);
-        while(!players[0].isTurnEnded()) {
-            Thread.sleep(100);
-        }
-        
-        if (players[1].getPlayerType().equals(Player.PlayerType.AI)) {
-            System.out.println("Игрок " + players[1].getName() + " расставляет корабли");
-        }
-        else {
-            JOptionPane.showMessageDialog(w, "Игрок " + players[1].getName() + " расставляет корабли");
-        }
-        w.invokeTurn(players[1]);
-        while(!players[1].isTurnEnded()) {
-            Thread.sleep(100);
+        for (final Player player : players) {
+            if (player.getPlayerType().equals(Player.PlayerType.AI)) {
+                System.out.println("Игрок " + player.getName() + " расставляет корабли");
+            }
+            else {
+                JOptionPane.showMessageDialog(w, "Игрок " + player.getName() + " расставляет корабли");
+            }
+            w.invokeTurn(player);
+            while(!player.isTurnEnded()) {
+                Thread.sleep(100);
+            }
         }
         
         //объединяем карты
@@ -48,18 +39,14 @@ public class MainApp {
         players[1].getOpponentShipsPlacement().setShipsMap(p1shipsMap);
         
         int i = 0;
-        int s = 0;
         Map<Coordinates, FieldStatus> shotsMapBuffer = null;
         while(!w.getGamePhase().equals(GamePhase.GameOver)) {
             if (shotsMapBuffer != null) {
                 players[i].getOwnShipsPlacement().setShotsMap(shotsMapBuffer);
             }
             w.invokeTurn(players[i]);
-            s++;
-            if (s >= players.length) {
-                s = 0;
-            }
-            if (players[s].getPlayerType().equals(Player.PlayerType.Human) && players[i].getPlayerType().equals(Player.PlayerType.Human)) {
+
+            if (players[Math.abs(i-1)].getPlayerType().equals(Player.PlayerType.Human) && players[i].getPlayerType().equals(Player.PlayerType.Human)) {
                 JOptionPane.showMessageDialog(w, "Ход игрока " + players[i].getName());
             }
             else {
@@ -69,13 +56,9 @@ public class MainApp {
                 Thread.sleep(400);
             }
             shotsMapBuffer = players[i].getOpponentShipsPlacement().getShotsMap();
-            i++;
-            if (i >= players.length) {
-                i = 0;
-            }
+            i = Math.abs(i-1);
         }
-        System.out.println("Конец игры");
-        //w.invokeTurn(player2);
+        JOptionPane.showMessageDialog(w, "Конец игры! Победил игрок " + players[Math.abs(i-1)].getName() + "!");
     }
 
 }

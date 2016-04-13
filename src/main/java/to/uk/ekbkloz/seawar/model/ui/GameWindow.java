@@ -62,6 +62,7 @@ public class GameWindow extends JFrame {
         
         //поле с информацией
         information = new JLabel();
+        information.setText("Sea War");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
@@ -119,7 +120,6 @@ public class GameWindow extends JFrame {
                         shipsAdditionPanel.setVisible(false);
                         gamePhase = GamePhase.Battle;
                     }
-                    middlePanel.repaint();
                 }
             }
             
@@ -192,7 +192,6 @@ public class GameWindow extends JFrame {
                         curPlayerTurn = null;
                         ownMap.cleanMap();
                         opponentMap.cleanMap();
-                        middlePanel.repaint();
                     }
                 }
             }
@@ -216,7 +215,6 @@ public class GameWindow extends JFrame {
         if(!gamePhase.equals(GamePhase.ShipAddtion)) {
             opponentMap.drawMap(curPlayerTurn.getOpponentShipsPlacement(), player.getPlayerType());
         }
-        middlePanel.repaint();
         turnsCount++;
         
         if (curPlayerTurn.getPlayerType().equals(Player.PlayerType.AI) && gamePhase.equals(GamePhase.ShipAddtion)) {
@@ -280,7 +278,6 @@ public class GameWindow extends JFrame {
             curPlayerTurn = null;
             ownMap.cleanMap();
             opponentMap.cleanMap();
-            middlePanel.repaint();
             return;
         }
     }

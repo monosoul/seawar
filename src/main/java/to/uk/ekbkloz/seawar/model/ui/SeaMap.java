@@ -29,7 +29,7 @@ public class SeaMap extends JPanel {
         this.setBackground(Color.WHITE);
         this.setSize(400, 400);
         this.setEnabled(false);
-        this.setVisible(false);
+        //this.setVisible(false);
         /*
         for (int i = 0; i < MAPSIZE; i++) {
             for (int j = 0; j < MAPSIZE; j++) {
@@ -55,7 +55,7 @@ public class SeaMap extends JPanel {
         
         if (playerType.equals(Player.PlayerType.Human)) {
             this.setEnabled(true);
-            this.setVisible(true);
+            //this.setVisible(true);
         }
         this.repaint();
     }
@@ -63,8 +63,9 @@ public class SeaMap extends JPanel {
     public void cleanMap() {
         if (this.shipsPlacement != null) {
             this.setEnabled(false);
-            this.setVisible(false);
+            //this.setVisible(false);
             shipsPlacement = null;
+            super.paintComponent(this.getGraphics());
         }
     }
 
@@ -335,7 +336,12 @@ public class SeaMap extends JPanel {
             for (int i = 0; i < MAPSIZE; i++) {
                 for (int j = 0; j < MAPSIZE; j++) {
                     //fields[i][j]
-                    g.setColor(shipsPlacement.getFields()[i][j].getColor());
+                    try{
+                      g.setColor(shipsPlacement.getFields()[i][j].getColor());
+                    }
+                    catch(final Exception e){
+                        e.printStackTrace();
+                    }
                     g.fillRect(i*40, j*40, 40, 40);
                 }
             }
