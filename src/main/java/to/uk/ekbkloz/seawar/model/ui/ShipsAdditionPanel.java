@@ -12,6 +12,7 @@ import to.uk.ekbkloz.seawar.model.ships.Carrier;
 import to.uk.ekbkloz.seawar.model.ships.Cruiser;
 import to.uk.ekbkloz.seawar.model.ships.Destroyer;
 
+//класс панели добавления кораблей
 public class ShipsAdditionPanel extends JPanel {
 
     private static final long serialVersionUID = -7436304367252831567L;
@@ -32,6 +33,7 @@ public class ShipsAdditionPanel extends JPanel {
 
 
     public ShipsAdditionPanel() {
+        //в зависимости от того, какая кнопка была нажата, метод getShipToAdd() будет возвращать класс корабля
         this.setBackground(Color.WHITE);
         this.setSize(400, 200);
         
